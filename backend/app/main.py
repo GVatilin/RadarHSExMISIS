@@ -5,6 +5,10 @@ from app.config import DefaultSettings, get_settings
 from app.endpoints import list_of_routes
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from app.endpoints.admin import flask_app
+from fastapi.middleware.wsgi import WSGIMiddleware
+
+
 logger = getLogger(__name__)
 
 
@@ -45,6 +49,7 @@ app.add_middleware(
     secret_key="your_random_secret_key",
 )
 
+app.mount("/panel", WSGIMiddleware(flask_app))
 if __name__ == "__main__":
     settings_for_application = get_settings()
     run(

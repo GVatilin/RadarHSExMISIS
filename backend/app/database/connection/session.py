@@ -2,6 +2,8 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from app.config import get_settings
+from sqlalchemy import create_engine
+
 
 settings = get_settings()
 
@@ -37,3 +39,8 @@ def refresh_engine() -> None:
         class_=AsyncSession,
         expire_on_commit=False
     )
+
+
+def get_sync_session():
+    with sessionmaker(create_engine(settings.database_uri_sync))() as session:
+        yield session

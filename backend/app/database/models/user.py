@@ -5,7 +5,7 @@ import uuid
 
 
 class User(DeclarativeBase):
-    __tablename__ = "users"
+    __tablename__ = "Users"
 
     id = Column(
         UUID(as_uuid=True),
@@ -15,12 +15,4 @@ class User(DeclarativeBase):
     )
     username = Column(String, index=True, unique=True)
     email = Column(String, unique=True)
-    premium = Column(Boolean, default=False)
     password = Column(String)
-
-    name = Column(String)
-    age = Column(Integer)
-    about = Column(String)
-    hobby = Column(String)
-    goals = Column(Integer)
-    person_type = Column(Integer)

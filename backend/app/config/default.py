@@ -22,13 +22,6 @@ class DefaultSettings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
-    GOOGLE_CLIENT_ID: str
-    GOOGLE_CLIENT_SECRET: str
-
-    AWS_ACCESS_KEY_ID: str 
-    AWS_SECRET_ACCESS_KEY: str 
-    AWS_BUCKET_NAME: str
-
     PWD_CONTEXT: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     model_config = SettingsConfigDict(env_file="../.env", extra='ignore') 
