@@ -1,10 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from datetime import timezone
+from datetime import timezone, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.models import News, Source, Timeline, Entity
+from app.database.models import News, Source, Timeline, Entity, Post
 from app.schemas import NewsResponse, NewsPostResponse, TimelineResponse, NewsPostCreate
+from app.utils.report import get_top_k
 
 
 def _tz_aware(dt):
@@ -48,8 +49,34 @@ async def get_all_news_utils(session) -> NewsResponse:
     return NewsResponse(news=posts)
 
 
-async def get_report_utils(session: AsyncSession) -> NewsResponse:
-    pass
+async def get_report_utils(hours: int, session: AsyncSession):
+    if hours <= 0:
+        hours = 1
+
+    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+
+    stmt = (
+        select(Post)
+        .where(Post.date >= since)
+        .order_by(Post.date.desc())
+    )
+    res = await session.execute(stmt)
+    posts = res.scalars().all()
+
+    post_dicts: List[Dict[str, Any]] = []
+    for p in posts:
+        post_dicts.append(
+            {
+                "text": p.text or "",
+                "date": p.date.isoformat() if p.date else None,
+                "channel_id": str(p.channel_id) if getattr(p, "channel_id", None) else None,
+                "message_num": getattr(p, "message_num", None),
+            }
+        )
+
+    top = await get_top_k(post_dicts)
+    posts_out = [NewsPostResponse.model_validate(item) for item in top]
+    return NewsResponse(news=posts_out)
 
 
 async def create_news_utils(payload: NewsPostCreate, session: AsyncSession) -> NewsPostResponse:

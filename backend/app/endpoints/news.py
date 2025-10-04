@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Security, status, HTTPException, \
-    Body, Path
+    Body, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 from uuid import UUID
@@ -34,9 +34,10 @@ async def get_all_news(session: Annotated[AsyncSession, Depends(get_session)]
                          "descriprion": "Non authorized"
                      }
                  })
-async def get_report(session: Annotated[AsyncSession, Depends(get_session)]
-                     ) -> NewsResponse:
-    return await get_report_utils(session)
+async def get_report(session: Annotated[AsyncSession, Depends(get_session)],
+                     hours: int = Query(description="За сколько часов")
+                     ):
+    return await get_report_utils(hours, session)
 
 
 @api_router.post('/create_news',
