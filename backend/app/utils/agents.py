@@ -41,14 +41,20 @@ def agent_top_k_hottest_news(hottest_news_list):
     3. Composite heat = sentiment_intensity + breadth_score.  
        Clip to 0–1 range.
 
+    Each input item has fields: text, date (ISO-8601 with tz), channel, message_num.
+    Preserve the original date, channel and message_num for every selected item.
+
     Output format: strict JSON list of 5 objects, no preamble, no markdown fences.  
     Each object:
     {
       "rank": 1-5,
       "title": "<cleaned exact headline> (not very long)",
-      "message": "<cleaned summary in 2-3 sentenceses>",
+      "message": "<cleaned summary in 2-3 sentences>",
       "heat": <0.xxx rounded 3 decimals>,
-      "why_now": "<1-2 short phrases: novelty + impact + asset scale>"
+      "why_now": "<1-2 short phrases: novelty + impact + asset scale>",
+      "datetime": "<original ISO-8601 date string>",
+      "channel": "<original channel string>",
+      "message_num": <original integer>
     }
     Sort descending by heat; resolve ties by original list order.
     """
