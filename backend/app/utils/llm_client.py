@@ -1,17 +1,23 @@
 import os
-from typing import Optional, Any
+import asyncio
+from typing import Optional
+
 from dotenv import load_dotenv
-from openai import RateLimitError, APIConnectionError, APIStatusError
+from openai import (
+    RateLimitError,
+    APIConnectionError,
+    APIStatusError,
+)
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-
 DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_BASE_URL: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-
+OPENROUTER_BASE_URL: str = os.getenv(
+    "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
+)
 
 API_NOT_INITIALIZED_ERROR = "[ОШИБКА API] Клиент OpenRouter не инициализирован."
 API_RATE_LIMIT_ERROR = "[ОШИБКА API] Превышен лимит запросов к API."
@@ -19,7 +25,15 @@ API_CONNECTION_ERROR = "[ОШИБКА API] Не удалось подключи�
 API_GENERAL_ERROR = "[ОШИБКА API] Произошла ошибка при обращении к API."
 
 
-def call_llm(prompt_text, system_instruction = "", model = DEFAULT_MODEL, temperature = 0):
+async def call_llm(
+    prompt_text: str,
+    system_instruction: str = "",
+    model: Optional[str] = None,
+    temperature: float = 0.0,
+) -> str:
+    """
+    Асинхронно обращается к OpenRouter и возвращает ответ модели.
+    """
     if not OPENROUTER_API_KEY:
         return API_NOT_INITIALIZED_ERROR
 
@@ -27,7 +41,7 @@ def call_llm(prompt_text, system_instruction = "", model = DEFAULT_MODEL, temper
         llm = ChatOpenAI(
             base_url=OPENROUTER_BASE_URL,
             api_key=OPENROUTER_API_KEY,
-            model=model,
+            model=model or DEFAULT_MODEL,
             temperature=temperature,
         )
 
@@ -36,7 +50,8 @@ def call_llm(prompt_text, system_instruction = "", model = DEFAULT_MODEL, temper
             messages.append(SystemMessage(content=system_instruction))
         messages.append(HumanMessage(content=prompt_text))
 
-        response = llm.invoke(messages)
+        # В langchain-openai >= 0.1 агент уже поддерживает awaitable-интерфейс
+        response = await llm.ainvoke(messages)
         return response.content.strip()
 
     except RateLimitError:
@@ -49,20 +64,32 @@ def call_llm(prompt_text, system_instruction = "", model = DEFAULT_MODEL, temper
         return f"{API_GENERAL_ERROR} {e}"
 
 
-def call_qwen(user_prompt, system_instruction = ''):
-    return call_llm(
+async def call_qwen(
+    user_prompt: str,
+    system_instruction: str = "",
+    model: Optional[str] = None,
+    temperature: float = 0.0,
+) -> str:
+    """
+    Удобная обёртка поверх call_llm (по аналогии с вашей старой call_qwen).
+    """
+    return await call_llm(
         prompt_text=user_prompt,
-        system_instruction=system_instruction
+        system_instruction=system_instruction,
+        model=model or DEFAULT_MODEL,
+        temperature=temperature,
     )
 
 
+# Если нужен «скриптовый» запуск из консоли
 if __name__ == "__main__":
-    user_question = "Who are you? Who is your creator?"
-    system_prompt = "Answer like a Rust Cohle from True Detective"
+    async def _demo():
+        user_question = "Who are you? Who is your creator?"
+        system_prompt = "Answer like Rust Cohle from True Detective"
+        answer = await call_qwen(user_question, system_prompt)
+        print("-" * 100)
+        print("Ответ модели:")
+        print(answer)
+        print("-" * 100)
 
-    answer = call_qwen(user_prompt=user_question, system_instruction=system_prompt)
-
-    print("------------" * 50)
-    print("Ответ модели:")
-    print(answer)
-    print("------------" * 50)
+    asyncio.run(_demo())
