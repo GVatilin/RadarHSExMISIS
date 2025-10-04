@@ -1,0 +1,145 @@
+.news-feed {
+    flex: 1;
+    padding: 32px;
+    background: white;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .news-feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .news-feed-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .news-date {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .news-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .filter-dropdown {
+    position: relative;
+  }
+  
+  .filter-select {
+    padding: 10px 16px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #6906FD;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 150px;
+  }
+  
+  .filter-select:focus {
+    outline: none;
+    border-color: #6906FD;
+  }
+  
+  .news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .news-card {
+    padding: 20px;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .news-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  .news-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  
+  .news-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .news-ticker {
+    color: #6906FD;
+    font-weight: 600;
+  }
+  
+  .news-hotness {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 16px;
+  }
+  
+  .hotness-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #FF6B35;
+  }
+  
+  .news-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  
+  .read-more-btn {
+    background: none;
+    border: none;
+    color: #6906FD;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  
+  .read-more-btn:hover {
+    text-decoration: underline;
+  }
+  
+  .news-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #F0F0F0;
+  }
+  
+  .news-source {
+    font-size: 13px;
+    color: #999;
+  }
+  
+  .news-sentiment {
+    font-size: 13px;
+    font-weight: 600;
+  }
