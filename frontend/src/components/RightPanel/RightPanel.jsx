@@ -3,6 +3,7 @@ import { BiPencil } from 'react-icons/bi';
 import { AiOutlineSmile, AiOutlineLike, AiFillFire } from 'react-icons/ai';
 import { BsGraphUp } from 'react-icons/bs';
 import { useNewsStore } from '../../store/newsStore';
+import { getSentimentColor, getSentimentText, formatDate } from '../../utils/helpers';
 import './RightPanel.css';
 
 const RightPanel = () => {
@@ -10,32 +11,28 @@ const RightPanel = () => {
   const selectedNews = useNewsStore((state) => state.selectedNews);
 
   const handleSubmitDraft = () => {
-    console.log('Draft submitted:', draftText);
+    if (!draftText.trim()) {
+      alert('Напишите текст черновика');
+      return;
+    }
+    
+    console.log('Draft submitted:', {
+      text: draftText,
+      news: selectedNews
+    });
+    
     // Здесь будет отправка на бэкенд
     alert('Черновик создан!');
     setDraftText('');
   };
 
-
-  const copyContentToClipboard = () => {
-    const title = document.querySelector('.preview-title').innerText;
-    const description = document.querySelector('.preview-description').innerText;
-    const contentToCopy = `${title}\n${description}`;
-    
-    navigator.clipboard.writeText(contentToCopy)
-      .then(() => {
-        console.log('Содержимое скопировано в буфер обмена');
-      })
-      .catch(err => {
-        console.error('Ошибка при копировании содержимого: ', err);
-      });
+  const handleCopyNews = () => {
+    if (selectedNews) {
+      const textToCopy = `${selectedNews.headline}\n\n${selectedNews.text}\n\n${selectedNews.why_now || ''}`;
+      navigator.clipboard.writeText(textToCopy);
+      alert('Новость скопирована в буфер обмена');
+    }
   };
-
-
-
-
-
-
 
   return (
     <div className="right-panel">
@@ -46,47 +43,90 @@ const RightPanel = () => {
       </div>
 
       {/* Selected News Preview */}
-      {selectedNews && (
+      {selectedNews ? (
         <div className="selected-news-preview">
           <h3 className="preview-title">
-            {selectedNews.title.split('#')[0]}
-            <span className="preview-ticker">#{selectedNews.company}</span>
-            {selectedNews.title.split('#')[1]?.replace(selectedNews.company, '')}
+            {selectedNews.headline}
+            {selectedNews.entities && selectedNews.entities.length > 0 && (
+              <span className="preview-ticker"> #{selectedNews.entities[0]}</span>
+            )}
           </h3>
-          <p className="preview-description">{selectedNews.description}</p>
           
-          <button className="preview-link">Статья →</button>
+          <p className="preview-description">{selectedNews.text}</p>
+          
+          {selectedNews.why_now && (
+            <div className="preview-why-now">
+              <strong>Почему сейчас:</strong>
+              <p>{selectedNews.why_now}</p>
+            </div>
+          )}
 
-          <div className="preview-reactions">
-            {/*<span className="reaction-item">
-              {selectedNews.reactions.smile} <AiOutlineSmile size={18} />
-            </span>*/}
-            <span className="reaction-item">
-              {selectedNews.reactions.thumbsUp} <AiOutlineLike size={18} />
-            </span>
-            {/*<span className="reaction-item">
-              {selectedNews.reactions.fire} <AiFillFire size={18} />
-            </span>*/}
-            <span className="reaction-item">
-              {selectedNews.reactions.chart} <BsGraphUp size={18} />
-            </span>
+          {selectedNews.sources && selectedNews.sources.length > 0 && (
+            <div className="preview-sources">
+              <strong>Источники:</strong>
+              <div className="sources-list">
+                {selectedNews.sources.map((source, idx) => (
+                  <span key={idx} className="source-tag">{source}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedNews.entities && selectedNews.entities.length > 0 && (
+            <div className="preview-entities">
+              <strong>Упоминания:</strong>
+              <div className="entities-list">
+                {selectedNews.entities.map((entity, idx) => (
+                  <span key={idx} className="entity-tag">{entity}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="preview-stats">
+            <div className="stat-item">
+              <span className="stat-label">Горячесть:</span>
+              <span className="stat-value">
+                {selectedNews.hotness} <AiFillFire color="#FF6B35" size={16} />
+              </span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Тональность:</span>
+              <span 
+                className="stat-value"
+                style={{ color: getSentimentColor(selectedNews.sentiment) }}
+              >
+                {getSentimentText(selectedNews.sentiment)}
+              </span>
+            </div>
           </div>
 
-          <button className="copy-btn" onClick={copyContentToClipboard}>Копировать</button>
+          <button className="copy-btn" onClick={handleCopyNews}>
+            Копировать
+          </button>
 
-          <div className="news-meta">
-            <span className="news-meta-date">{selectedNews.date}</span>
-          </div>
+          {selectedNews.timeline && selectedNews.timeline.length > 0 && (
+            <div className="news-meta">
+              <span className="news-meta-date">
+                {formatDate(selectedNews.timeline[0].date)}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="no-selection">
+          <p>Выберите новость из ленты для создания черновика</p>
         </div>
       )}
 
       {/* Draft Editor */}
       <div className="draft-editor">
+        <h3 className="editor-title">Создание черновика</h3>
+        
         <div className="editor-actions">
-          <button className="editor-action-btn">Повысить тон</button>
-          <button className="editor-action-btn">Понизить тон</button>
-          <button className="editor-action-btn">Повысить темп.</button>
-          <button className="editor-action-btn">Понизить темп.</button>
+          <button className="editor-action-btn">Поменять тональность</button>
+          <button className="editor-action-btn">Повысить температуру</button>
+          <button className="editor-action-btn">Понизить</button>
         </div>
 
         <textarea
