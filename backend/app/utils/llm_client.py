@@ -49,10 +49,11 @@ def call_llm(prompt_text, system_instruction = "", model = DEFAULT_MODEL, temper
         return f"{API_GENERAL_ERROR} {e}"
 
 
-def call_qwen(user_prompt, system_instruction = ''):
+def call_qwen(user_prompt, system_instruction = '', model=DEFAULT_MODEL):
     return call_llm(
         prompt_text=user_prompt,
-        system_instruction=system_instruction
+        system_instruction=system_instruction,
+        model=model
     )
 
 
