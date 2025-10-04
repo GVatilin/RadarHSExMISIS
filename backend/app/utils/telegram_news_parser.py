@@ -16,8 +16,9 @@ from telethon.errors import SessionPasswordNeededError
 warnings.filterwarnings("ignore", message="Using async sessions support is an experimental feature")
 
 # -----------  SETTINGS  -----------
-ALL_CHANNELS = ['MarketTwits', 'Crypto Headlines', 'The Экономист']   # <-- EDIT HERE
+ALL_CHANNELS = ['MarketTwits', 'Crypto Headlines', 'The Экономист', 'Финам Инвестиции', 'Банкста']   # <-- EDIT HERE
 ROOT_DIR     = Path("telegram_channels_latest_news")
+
 ROOT_DIR.mkdir(exist_ok=True)
 # -----------------------------------
 
