@@ -12,13 +12,11 @@ from app.database.connection import get_session
 from app.database.models import Channel, Post
 from app.config import get_settings
 from app.database.connection.session import async_session_maker
+from app.utils.convert import convert 
 
-# ----------- Pyrogram client (singleton) -----------
 _pyro: Optional[Client] = None
 
 def _build_pyro() -> Client:
-    """Создаём Pyrogram Client из ENV/конфига.
-       Поддерживает session_string (ENV: PYROGRAM_SESSION_STRING) или файл .session (ENV: PYROGRAM_SESSION_NAME)."""
     s = get_settings()
     api_id = int(s.TG_API_ID)
     api_hash = s.TG_API_HASH
@@ -31,7 +29,7 @@ async def get_pyro_client() -> Client:
     if _pyro:
         return _pyro
     _pyro = _build_pyro()
-    await _pyro.start()  # если нет строки и файла — локально спросит номер/код (в контейнере лучше задать PYROGRAM_SESSION_STRING)
+    await _pyro.start()
     return _pyro
 
 # ----------- utils -----------
@@ -44,7 +42,6 @@ from logging import getLogger
 log = getLogger("radar")
 
 async def poll_channel_once(db: AsyncSession, ch: Channel) -> int:
-    """Забрать все сообщения с id > last_message_num для данного канала (Pyrogram)."""
     app = await get_pyro_client()
 
     username = ch.username.lstrip("@")
@@ -52,7 +49,7 @@ async def poll_channel_once(db: AsyncSession, ch: Channel) -> int:
 
     max_seen = since_id
     cnt = 0
-    page_size = 10  # страница истории
+    page_size = 10
 
     log.info("poll %s since_id=%s", username, since_id)
 
@@ -67,7 +64,7 @@ async def poll_channel_once(db: AsyncSession, ch: Channel) -> int:
             Post(
                 text=text,
                 date=_to_utc(m.date),
-                channel_id=ch.id,           # ← вариант с FK
+                channel_id=ch.id,
                 message_num=m.id,
             )
         )
@@ -105,6 +102,17 @@ async def poll_all_channels_once() -> int:
             except FloodWait as e:
                 await asyncio.sleep(e.value)
             except Exception:
+                log.exception("poll_channel_once failed")
                 continue
+
         await session.commit()
+
+        try:
+            created = await convert(session)
+            log.info("aggregated news stored: %s", created)
+            await session.commit()
+        except Exception:
+            log.exception("failed to aggregate/store news")
+            await session.rollback()
+
     return total
