@@ -82,14 +82,12 @@ async def call_qwen(
 
 
 # Если нужен «скриптовый» запуск из консоли
-if __name__ == "__main__":
-    async def _demo():
-        user_question = "Who are you? Who is your creator?"
-        system_prompt = "Answer like Rust Cohle from True Detective"
-        answer = await call_qwen(user_question, system_prompt)
-        print("-" * 100)
-        print("Ответ модели:")
-        print(answer)
-        print("-" * 100)
+async def main():
+    question = "Explain quantum tunneling in one sentence."
+    system = "You are a helpful physics professor."
 
-    asyncio.run(_demo())
+    reply = await call_qwen(question, system)
+    print("Ответ:", reply)
+
+if __name__ == "__main__":
+    asyncio.run(main())
