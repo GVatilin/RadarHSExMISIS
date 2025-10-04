@@ -30,7 +30,7 @@ def call_finbert(text: str, model: Optional[str] = None) -> List[Dict[str, float
                 res[1]['label'] : res[1]['score'],
                 res[2]['label'] : res[2]['score']}
     except Exception as e:
-        return [{"label": f"{API_GENERAL_ERROR} {e}", "score": 0.0}]
+        return API_GENERAL_ERROR
 
 
 if __name__ == "__main__":
