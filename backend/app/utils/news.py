@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from datetime import timezone, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.models import News, Source, Timeline, Entity, Post
+from app.database.models import News, Source, Timeline, Entity, Post, Channel
 from app.schemas import NewsResponse, NewsPostResponse, TimelineResponse, NewsPostCreate
 from app.utils.report import get_top_k
 
@@ -49,7 +49,7 @@ async def get_all_news_utils(session) -> NewsResponse:
     return NewsResponse(news=posts)
 
 
-async def get_report_utils(hours: int, session: AsyncSession):
+async def get_report_utils(hours: int, session: AsyncSession) -> NewsResponse:
     if hours <= 0:
         hours = 1
 
@@ -61,21 +61,38 @@ async def get_report_utils(hours: int, session: AsyncSession):
         .order_by(Post.date.desc())
     )
     res = await session.execute(stmt)
-    posts = res.scalars().all()
+    posts: List[Post] = res.scalars().all()
+
+    if not posts:
+        return NewsResponse(news=[])
+
+    chan_ids = {p.channel_id for p in posts if getattr(p, "channel_id", None)}
+    chan_map: Dict[str, str] = {}
+    if chan_ids:
+        q = select(Channel.id, Channel.username).where(Channel.id.in_(chan_ids))
+        rows = await session.execute(q)
+        chan_map = {str(cid): uname for cid, uname in rows.all()}
 
     post_dicts: List[Dict[str, Any]] = []
     for p in posts:
+        username = chan_map.get(str(p.channel_id)) if getattr(p, "channel_id", None) else None
         post_dicts.append(
             {
                 "text": p.text or "",
                 "date": p.date.isoformat() if p.date else None,
-                "channel_id": str(p.channel_id) if getattr(p, "channel_id", None) else None,
+                "channel": username or "",
                 "message_num": getattr(p, "message_num", None),
             }
         )
 
     top = await get_top_k(post_dicts)
-    posts_out = [NewsPostResponse.model_validate(item) for item in top]
+
+    if isinstance(top, dict) and "news" in top:
+        items = top["news"] or []
+    else:
+        items = top or []
+
+    posts_out = [NewsPostResponse.model_validate(item) for item in items]
     return NewsResponse(news=posts_out)
 
 
