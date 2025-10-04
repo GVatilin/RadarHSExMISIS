@@ -24,6 +24,14 @@ class DefaultSettings(BaseSettings):
 
     PWD_CONTEXT: CryptContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+    API_KEY: str
+    OPENROUTER_BASE_URL: str
+    DEFAULT_MODEL: str
+
+    TG_API_ID: int
+    TG_API_HASH: str
+    TG_SESSION_STRING: str
+
     model_config = SettingsConfigDict(env_file="../.env", extra='ignore') 
 
     @property

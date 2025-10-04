@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Boolean, UUID, func, DateTime, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import DeclarativeBase
 import uuid
@@ -15,4 +16,8 @@ class Post(DeclarativeBase):
     )
 
     text = Column(String)
-    date = Column(DateTime)
+    date = Column(DateTime(timezone=True), nullable=False)
+
+    channel_id = Column(UUID, ForeignKey("Channels.id"), nullable=False)
+    channel = relationship("Channel")
+    message_num = Column(Integer)

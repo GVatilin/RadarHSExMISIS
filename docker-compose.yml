@@ -32,8 +32,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./backend/app:/backend/app
     networks:
       - network_name
     healthcheck:
