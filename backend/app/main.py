@@ -71,7 +71,7 @@ async def _poll_job():
 @app.on_event("startup")
 async def on_startup():
     await get_pyro_client()
-    scheduler.add_job(_poll_job, "interval", minutes=3, id="tg_poll_every_2m",
+    scheduler.add_job(_poll_job, "interval", minutes=1, id="tg_poll_every_2m",
                       max_instances=1, coalesce=True)
     scheduler.start()
 
