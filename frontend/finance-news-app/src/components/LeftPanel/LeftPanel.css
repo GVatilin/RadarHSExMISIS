@@ -1,0 +1,119 @@
+.left-panel {
+    width: 280px;
+    padding: 20px;
+    background: #FAFAFA;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid #E5E5E5;
+  }
+  
+  .search-box {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    font-size: 14px;
+    background: white;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6906FD;
+    font-size: 18px;
+  }
+  
+  .filter-section {
+    margin-bottom: 32px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #000;
+  }
+  
+  .filter-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: none;
+    background: white;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  
+  .filter-item:hover {
+    background: #F5F5F5;
+  }
+  
+  .item-icon {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+  
+  .company-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .company-item:hover {
+    background: #F5F5F5;
+  }
+  
+  .company-name {
+    font-size: 14px;
+    color: #000;
+  }
+  
+  .ticker {
+    color: #6906FD;
+    font-weight: 500;
+  }
+  
+  .company-hotness {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FF6B35;
+  }
+  
+  .show-all-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #6906FD;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  
+  .show-all-btn:hover {
+    background: #F5F5F5;
+  }
