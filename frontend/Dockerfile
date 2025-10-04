@@ -1,13 +1,16 @@
-FROM node:16-alpine
-
-WORKDIR /frontend
-
-COPY package*.json ./
-
-RUN npm install
-
+# ---------- build ----------
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
+RUN npm run build
 
-ENV PORT=8081
-
-CMD ["npm", "run", "serve"]
+# ---------- run ----------
+FROM node:20-alpine AS run
+WORKDIR /app
+RUN npm i -g serve
+# Vite кладёт сюда:
+COPY --from=build /app/dist /app/dist
+EXPOSE 8081
+CMD ["serve", "-s", "dist", "-l", "8081"]
